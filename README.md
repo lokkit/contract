@@ -1,16 +1,29 @@
-# Smart Contracts for chainlock
+# Smart Contracts for lokkit
 
-## Install `truffle`
+### Install required packages
 ```
 npm install -g truffle
+npm install -g ethereumjs-testrpc
 ```
 
-## Build contracts
+### Start testrpc
+This will start a test node (listening on localhost:8545).
+```
+testrpc
+```
+
+### Build contracts
 ```
 truffle build
 ```
 
-## Run tests
+### Run tests
 ```
 truffle test
 ```
+
+### Deploy contracts to localhost
+```
+truffle test
+```
+
