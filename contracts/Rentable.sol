@@ -27,6 +27,15 @@ contract Rentable {
 
   }
 
+  function getDescription() public returns(string) {
+    return description;
+  }
+  function getLocation() public returns(string) {
+    return location;
+  }
+  function getPricePerTime() public returns(uint) {
+    return pricePerTime;
+  }
 
   modifier currentReserverOnly {
     var (isReserved, reservation) = currentReservation();
