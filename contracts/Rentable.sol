@@ -6,26 +6,17 @@ contract Rentable {
     uint start;
     uint end;
     address renter;
-
   }
 
-  address public owner;
-  string public description;
-  string public location;
-  uint public pricePerTime;
-  bool public locked = false;
+  address owner;
+  string description;
+  string location;
+  uint pricePerTime;
+  uint deposit;
+  bool locked = false;
 
   Reservation[] reservations;
-
   event OnReserve(uint start, uint end, address renter);
-
-  modifier ownerOnly {
-    if (owner != msg.sender) {
-      throw;
-    }
-    _;
-
-  }
 
   function getDescription() public returns(string) {
     return description;
@@ -36,6 +27,25 @@ contract Rentable {
   function getPricePerTime() public returns(uint) {
     return pricePerTime;
   }
+  function getDeposit() public returns(uint) {
+    return deposit;
+  }
+
+  function Rentable(string pdescription, string plocation, uint ppricePerTime, uint pdeposit) public {
+    owner = msg.sender;
+    description = pdescription;
+    location = plocation;
+    pricePerTime = ppricePerTime;
+    deposit = pdeposit;
+    reservations.length = 0;
+  }
+
+  modifier ownerOnly {
+    if (owner != msg.sender) {
+      throw;
+    }
+    _;
+  }
 
   modifier currentReserverOnly {
     var (isReserved, reservation) = currentReservation();
@@ -44,17 +54,7 @@ contract Rentable {
       throw;
     }
     _;
-
   }
-
-  function Rentable(string pdescription, string plocation, uint ppricePerTime, uint deposit) public {
-    owner = msg.sender;
-    description = pdescription;
-    location = plocation;
-    pricePerTime = ppricePerTime;
-    reservations.length = 0;
-  }
-
 
   function allReservations() public constant returns (uint[3][]){
     uint[3][] memory data = new uint[3][](reservations.length);
@@ -64,7 +64,6 @@ contract Rentable {
     }
     return data;
   }
-
 
   function currentReservation() private constant returns (bool isReserved, Reservation reservation){
     uint time = now;
@@ -77,23 +76,17 @@ contract Rentable {
 
     }
     return (false, Reservation(0,0,0));
-
   }
-
 
   function occupiedAt(uint time) public constant returns (bool) {
     for (uint i = 0; i < reservations.length; i++){
       Reservation reservation = reservations[i];
       if (time >= reservation.start && time <= reservation.end){
         return true;
-
       }
-
     }
     return false;
-
   }
-
 
   function occupiedBetween(uint start, uint end) public constant returns (bool) {
     if (start >= end){
@@ -110,7 +103,6 @@ contract Rentable {
     }
     return false;
   }
-
 
   function rent(uint start, uint end) /*payable*/ public {
     if (start < now){
@@ -132,7 +124,6 @@ contract Rentable {
     reservations.push(Reservation({start:start, end:end, renter:msg.sender}));
     OnReserve(start, end, msg.sender);
   }
-
 
   function transferOwnership(address newOwner) public ownerOnly {
     if (newOwner.balance <= 0){
