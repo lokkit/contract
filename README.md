@@ -3,6 +3,8 @@
 ### Install required packages
 ```
 npm install -g truffle
+
+# for fast testing
 npm install -g ethereumjs-testrpc
 ```
 
@@ -24,8 +26,10 @@ truffle test
 
 ### Deploy contracts to localhost
 ```
-truffle test
+truffle deploy
 ```
+If no account address is specified in `truffle.js` then it will take the first account.
+You need to make sure, that this account is unlocked before deploying with truffle.
 
 ### Interact with the contract
 Here is an example how you can create a new contract instance

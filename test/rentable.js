@@ -31,7 +31,7 @@ contract('Rentable', function(accounts) {
   });
   it("reserve (rent) the rentable", function() {
     var contract;
-    var start = Math.round(+new Date()/1000); 
+    var start = Math.round(+new Date()/1000);
     var end = Math.round(+new Date()/1000) + 120;
 
     return Rentable.deployed().then(function(instance) {
@@ -40,11 +40,8 @@ contract('Rentable', function(accounts) {
     }).then(function() {
       return contract.allReservations.call();
     }).then(function(ret) {
-      console.log("got: " + typeof(ret.valueOf()));
-      console.log("got: " + typeof(ret));
-      console.log(ret.valueOf());
-      // TODO: try to implement assert
-      //assert.deepEqual(ret.valueOf(), [start, end, 1], "reservation is not correct");
+      // ret is a string like '123123,12312312,1'
+      assert.equal(ret, [start, end, 1].toString(), "reservation is not correct");
     });
   });
 });
