@@ -8,28 +8,15 @@ contract Rentable {
     address renter;
   }
 
-  address owner;
-  string description;
-  string location;
-  uint pricePerTime;
-  uint deposit;
-  bool locked = false;
+  address public owner;
+  string public description;
+  string public location;
+  uint public pricePerTime;
+  uint public deposit;
+  bool public locked = false;
 
   Reservation[] reservations;
   event OnReserve(uint start, uint end, address renter);
-
-  function getDescription() public returns(string) {
-    return description;
-  }
-  function getLocation() public returns(string) {
-    return location;
-  }
-  function getPricePerTime() public returns(uint) {
-    return pricePerTime;
-  }
-  function getDeposit() public returns(uint) {
-    return deposit;
-  }
 
   function Rentable(string pdescription, string plocation, uint ppricePerTime, uint pdeposit) public {
     owner = msg.sender;
