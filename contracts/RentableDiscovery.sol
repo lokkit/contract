@@ -1,5 +1,6 @@
 pragma solidity ^0.4.8;
-import "Rentable.sol";
+
+import "contracts/Rentable.sol";
 
 contract RentableDiscovery {
 

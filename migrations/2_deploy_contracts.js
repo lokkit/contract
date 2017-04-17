@@ -3,5 +3,6 @@ var RentableDiscovery = artifacts.require("./RentableDiscovery.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(Rentable, 'leDescription', 'leLocation', 7, 500);
+  deployer.link(Rentable, RentableDiscovery);
   deployer.deploy(RentableDiscovery);
 };
