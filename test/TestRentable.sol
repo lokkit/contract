@@ -10,7 +10,7 @@ contract TestRentable {
     Rentable c = Rentable(DeployedAddresses.Rentable());
 
     uint expected = 7;
-    Assert.equal(c.pricePerTime(), expected, "PricePerTime should initially be 7");
+    Assert.equal(c.costPerSecond(), expected, "PricePerTime should initially be 7");
   }
 
 }

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.8;
 
-import "contracts/Rentable.sol";
+import "./Rentable.sol";
 
 contract RentableDiscovery {
 
@@ -14,8 +14,8 @@ contract RentableDiscovery {
   }
   
   // creates a new rentable and registers it in the discovery
-  function registerNew(string pdescription, string plocation, uint ppricePerTime, uint pdeposit) returns (address) {
-    Rentable r = new Rentable(pdescription, plocation, ppricePerTime, pdeposit);
+  function registerNew(string pdescription, string plocation, uint pcostPerSecond, uint pdeposit) returns (address) {
+    Rentable r = new Rentable(pdescription, plocation, pcostPerSecond, pdeposit);
     r.transferOwnership(msg.sender);
 	rentables.push(r);
 	OnRegister(r);
