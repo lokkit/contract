@@ -6,11 +6,11 @@ import "../contracts/Rentable.sol";
 
 contract TestRentable {
 
-  function testInitialPricePerTimeOfDeployedContract() {
+  function testInitialCostPerSecondOfDeployedContract() {
     Rentable c = Rentable(DeployedAddresses.Rentable());
 
     uint expected = 7;
-    Assert.equal(c.costPerSecond(), expected, "PricePerTime should initially be 7");
+    Assert.equal(c.costPerSecond(), expected, "CostPerSecond should initially be 7");
   }
 
 }

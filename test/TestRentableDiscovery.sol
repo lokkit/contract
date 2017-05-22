@@ -7,7 +7,7 @@ import "../contracts/RentableDiscovery.sol";
 
 contract TestRentableDiscovery {
 
-  function testInitialPricePerTimeOfDeployedContract() {
+  function testInitialCostPerSecondOfDeployedContract() {
     RentableDiscovery discovery = RentableDiscovery(DeployedAddresses.RentableDiscovery());
 	  var rentables = discovery.all();
     var expected = new address[];

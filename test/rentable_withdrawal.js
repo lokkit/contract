@@ -2,7 +2,8 @@ var Rentable = artifacts.require("./Rentable.sol");
 
 contract('Rentable', function (accounts) {
   // vars to keep track of rents on a single rentable
-  var globalStart = Math.round(+new Date() / 1000);
+  var globalStart = Math.round(new Date() / 1000);
+  globalStart += 1000; // reserve in the future. Using now might not work...
 
   it("rent with exact money", function () {
     var contract;
@@ -12,6 +13,7 @@ contract('Rentable', function (accounts) {
       contract = instance;
       return instance.costInWei.call(start, end);
     }).then(function (costInWei) {
+      console.log("le cost is: " + costInWei.valueOf());
       return contract.rent(start, end, { from: accounts[0], value: costInWei });
     }).then(function () {
       return contract.myPendingRefund.call();
@@ -33,13 +35,13 @@ contract('Rentable', function (accounts) {
       return contract.deposit.call();
     }).then(function (depo) {
       deposit = depo;
-      return contract.refundReservationDeposit(start, end, { from: accounts[0] }); // only owner can refund deposit
+      return contract.completeReservation(start, end, { from: accounts[0] }); // only owner can refund deposit
     }).then(function () {
       return contract.myPendingRefund.call({ from: accounts[1] });
     }).then(function (pendingRefund) {
       assert.equal(deposit.valueOf(), pendingRefund.valueOf());
       var oldMoney = web3.eth.getBalance(contract.address);
-      contract.withdrawRefundedDeposits({ from: accounts[1] }).then(function () {
+      contract.withdrawRefunds({ from: accounts[1] }).then(function () {
         var newMoney = web3.eth.getBalance(contract.address);
         assert.equal(oldMoney.valueOf(), newMoney.add(deposit).valueOf(), "check if deposit has been returned sucessfully.");
       });
@@ -47,19 +49,22 @@ contract('Rentable', function (accounts) {
   });
 
   it("rent with too much money", function () {
-    var contract, costInWei;
+    var contract, costInWei, existingRefund;
     var start = globalStart + 123;
     var end = start + 120;
     return Rentable.deployed().then(function (instance) {
       contract = instance;
       return instance.costInWei.call(start, end);
     }).then(function (cost) {
-      costInWei = cost.valueOf();
+      costInWei = cost;
+      return contract.myPendingRefund.call({ from: accounts[0] });
+    }).then(function (refund) {
+      existingRefund = refund;
       return contract.rent(start, end, { from: accounts[0], value: costInWei * 2 });
     }).then(function () {
       return contract.myPendingRefund.call({ from: accounts[0] });
     }).then(function (refund) {
-      assert.equal(refund.valueOf(), costInWei); // I sent costInWei*2, so I expect to get costInWei refunded.
+      assert.equal((refund - existingRefund).valueOf(), costInWei.valueOf()); // I sent costInWei*2, so I expect to get costInWei refunded.
     });
   });
 

@@ -1,4 +1,5 @@
-var Rentable = artifacts.require("./RentableDiscovery.sol");
+var RentableDiscovery = artifacts.require("./RentableDiscovery.sol");
+var Rentable = artifacts.require("./Rentable.sol");
 
 contract('RentableDiscovery', function(accounts) {
   it("can create contract using factory method", function() {
@@ -6,11 +7,11 @@ contract('RentableDiscovery', function(accounts) {
     var location = "some location";
     var costPerSecond = 115;
     var deposit = 1000;
-    return Rentable.deployed().then(function(instance) {
+    return RentableDiscovery.deployed().then(function(instance) {
       return instance.registerNew(description, location, costPerSecond, deposit, {from: accounts[0]});
     }).then(function(rentable) {
       var rentableCostPerSecond = rentable.costPerSecond.call()
-      assert.equal(costPerSecond, rentableCostPerSecond, "pricePerTime is not 7");
+      assert.equal(costPerSecond, rentableCostPerSecond, "costPerSecond is not " + costPerSecond);
     });
   });
 });
