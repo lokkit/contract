@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 // An object that can be rented.
 contract Rentable {
-  
+
   // Contains information to the period during which a Rentable was rented.
   struct Reservation {
     // unix timestamp when the reservation starts
@@ -20,7 +20,7 @@ contract Rentable {
   }
 
   // Current owner of the rentable. Can be changed by the owner by calling transferOwnership.
-  address public owner; 
+  address public owner;
   // Any text
   string public description;
   // Any text
@@ -193,13 +193,13 @@ contract Rentable {
     }
     uint timeDelta = reservation.end - now;
     uint totalTime = reservation.end - reservation.start;
-    // refund is: 
+    // refund is:
     // the amount of ether paid for the period (cost - deposit)
     // in ratio to the amount of time the rentable was returned early (timeDelta / totalTime)
     uint earlyReturnRefund = (reservation.cost - reservation.deposit) * timeDelta / totalTime;
     pendingRefunds[msg.sender] += earlyReturnRefund / 2;
     pendingRefunds[owner] += earlyReturnRefund / 2;
-    
+
     reservation.end = now; // change current reservation to end now.
     reservation.cost -= earlyReturnRefund;
   }

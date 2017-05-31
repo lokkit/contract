@@ -53,4 +53,74 @@ contract('Rentable', function (accounts) {
       assert.equal(ret, [start, end, 1].toString(), "reservation is not correct");
     });
   });
+
+  it("rent and check if reserved between", function () {
+    var contract;
+    var start = globalStart + 122;
+    var end = start + 120;
+    return Rentable.deployed().then(function (instance) {
+      contract = instance;
+      return instance.costInWei(start, end);
+    }).then(function (costInWei) {
+      return contract.rent(start, end, { from: accounts[0], value: costInWei.valueOf() });
+    }).then(function () {
+
+      // Test
+      var s = start;
+      var e = end;
+      console.log('Reservation from ' + s + ' to ' + e)
+      console.log('Check if reserved between ' + s + ' and ' + e + '\t+----+')
+      contract.reservedBetween.call(s, e).then(function (ret) {
+        assert(ret, 'reservedBetween should return true to indicate that there is a reservation');
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t+----+' + ' -> success')
+
+        // Test
+        s = start-5
+        e = start+5
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t--|->  |')
+        return contract.reservedBetween.call(s, e)
+      }).then(function (ret) {
+        assert(ret, 'reservedBetween should return true to indicate that there is a reservation');
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t--|->  |' + ' -> success')
+
+        // Test
+        s = end-5
+        e = end+5
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t|  --|-> ')
+        return contract.reservedBetween.call(s, e)
+      }).then(function (ret) {
+        assert(ret, 'reservedBetween should return true to indicate that there is a reservation');
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t|  --|-> ' + ' -> success')
+
+        // Test
+        s = start-5
+        e = end+5
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t--| |--> ')
+        return contract.reservedBetween.call(s, e)
+      }).then(function (ret) {
+        assert(ret, 'reservedBetween should return true to indicate that there is a reservation');
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t--| |--> ' + ' -> success')
+
+        // Test: check for no collition
+        s = start-5
+        e = start-1
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t--->|   |')
+        return contract.reservedBetween.call(s, e);
+      }).then(function (ret) {
+        console.log('hasdhfahsdfhasdhfh: ' + ret)
+        assert(!ret, 'reservedBetween should return false to indicate that there is no reservation');
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t--->|   |' + ' -> success')
+
+        // Test
+        s = end+1
+        e = end+5
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t|   |--->')
+        return contract.reservedBetween.call(s, e)
+      }).then(function (ret) {
+        assert(!ret, 'reservedBetween should return false to indicate that there is no reservation');
+        console.log('Check if reserved between ' + s + ' and ' + e + '\t|   |--->' + ' -> success')
+      })
+    });
+  });
+
 });
