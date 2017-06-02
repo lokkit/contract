@@ -35,8 +35,8 @@ contract Rentable {
   // The amount of wei that an address can claim by calling withdrawRefundedDepsoits.
   mapping (address => uint) pendingRefunds;
 
-  // Is raised when someone rents the Rentable.
-  event OnRent(uint start, uint end, address renter);
+  // Event to send updates when someone is about to rent
+  event OnRent(bool indexed success, address indexed renter, uint start, uint end, string msg);
 
   // Creates a new rentable.
   function Rentable(string pdescription, string plocation, uint pcostPerSecond, uint pdeposit) public {
@@ -153,24 +153,27 @@ contract Rentable {
   // Lets an address rent the Rentable for a given period.
   function rent(uint start, uint end) payable public {
     if (start >= end){
-      throw; // invalid input. Start cannot be bigger than end.
+      // API abuse: Start cannot be bigger than end.
+      throw;
     }
     if (start < now){
-      throw; // invlaid input. Cannot rent in the past.
+      OnRent(false, msg.sender, start, end, 'Cannot rent in the past');
+      return;
     }
     if (reservedBetween(start, end)) {
-      throw; // invalid input. Rentable is occuppied in desired timeframe.
+      OnRent(false, msg.sender, start, end, 'Requested time timeframe not free');
+      return;
     }
 
     uint cost = costInWei(start, end);
-    OnRent(cost, msg.value, msg.sender);
     if (msg.value < cost) {
-      throw; // not enough money sent by renter
+      // API provides function to calculate costs. Because of this
+      // we raise a exception here (not enough money sent by renter)
+      throw;
     }
     pendingRefunds[msg.sender] += msg.value - cost; // add excess value sent to refunds
-    OnRent(pendingRefunds[msg.sender], 0, msg.sender);
     reservations.push(Reservation({start:start, end:end, renter:msg.sender, refunded:false, cost:cost, deposit:deposit})); // add the reservation to the internal state (in blockchain)
-    OnRent(start, end, msg.sender);
+    OnRent(true, msg.sender, start, end, 'Successfuly rented');
   }
 
   // todo: remove utility before release
