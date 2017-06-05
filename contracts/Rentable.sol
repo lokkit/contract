@@ -11,9 +11,9 @@ contract Rentable {
     uint end;
     // ethereum address of the entity renting the object
     address renter;
-    // wehter the deposit was refunded
-    bool refunded;
-    // the amount of ether (in wei) that was paid to rent (excluding deposit)
+    // whether the rentable was unclaimed
+    bool unclaimed;
+    // the amount of ether (in wei) that was paid to rent (including deposit)
     uint cost;
     // the deposit at the time of reservation
     uint deposit;
@@ -172,14 +172,14 @@ contract Rentable {
       throw;
     }
     pendingRefunds[msg.sender] += msg.value - cost; // add excess value sent to refunds
-    reservations.push(Reservation({start:start, end:end, renter:msg.sender, refunded:false, cost:cost, deposit:deposit})); // add the reservation to the internal state (in blockchain)
+    reservations.push(Reservation({start:start, end:end, renter:msg.sender, unclaimed:false, cost:cost, deposit:deposit})); // add the reservation to the internal state (in blockchain)
     OnRent(true, msg.sender, start, end, 'Successfuly rented');
   }
 
   // Ends the current Reservation to end now.
   // Refunds half the paid amount to the renter and owner each.
   // Calling completeReservation will pay the owner and refund the deposit to the renter.
-  function finishEarly () public currentRenterOnly {
+  function unclaim () public currentRenterOnly {
     var (isReserved, reservation) = currentReservation();
     if (!isReserved){
       return;
@@ -191,33 +191,31 @@ contract Rentable {
     // in ratio to the amount of time the rentable was returned early (timeDelta / totalTime)
     uint earlyReturnRefund = (reservation.cost - reservation.deposit) * timeDelta / totalTime;
     pendingRefunds[msg.sender] += earlyReturnRefund / 2;
+    pendingRefunds[msg.sender] += reservation.deposit;
     pendingRefunds[owner] += earlyReturnRefund / 2;
 
     reservation.end = now; // change current reservation to end now.
     reservation.cost -= earlyReturnRefund;
+    reservation.unclaimed = true;
   }
 
   // Refunds deposit to renter and sends the owner the paid ether.
-  function completeReservation(uint start, uint end) public ownerOnly {
+  function forceUnclaim() public ownerOnly {
     for (uint i = 0; i < reservations.length; i++){
-      Reservation r = reservations[i];
-      if (r.start == start && r.end == end){
-        r.refunded = true;
-        pendingRefunds[owner] += r.cost - r.deposit;
-        pendingRefunds[r.renter] += r.deposit;
+      Reservation reservation = reservations[i];
+      if (reservation.end < now
+        && !reservation.unclaimed) { // renter did not call unclaim
+          pendingRefunds[owner] += reservation.cost;
+          reservation.unclaimed = true;
+        }
       }
     }
   }
 
   // Withdraw all my refunds.
-  function withdrawRefunds() public returns (bool) {
-    uint refund = pendingRefunds[msg.sender];
+  function withdrawRefunds() public {
+    uint currentRefund = pendingRefunds[msg.sender];
     pendingRefunds[msg.sender] = 0;
-    if (msg.sender.send(refund)) {
-        return true;
-    } else {
-        pendingRefunds[msg.sender] = refund;
-        return false;
-    }
+    msg.sender.transfer(currentRefund);
   }
 }
