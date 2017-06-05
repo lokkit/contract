@@ -176,16 +176,6 @@ contract Rentable {
     OnRent(true, msg.sender, start, end, 'Successfuly rented');
   }
 
-  // todo: remove utility before release
-  function rentNowUntil(uint end) payable public {
-    rent(now, end);
-  }
-
-  // todo: remove utility before release
-  function rentNowForMinutes(uint mins) payable public {
-    rent (now, (now + mins * 60));
-  }
-
   // Ends the current Reservation to end now.
   // Refunds half the paid amount to the renter and owner each.
   // Calling completeReservation will pay the owner and refund the deposit to the renter.
