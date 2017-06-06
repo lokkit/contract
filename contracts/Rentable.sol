@@ -189,10 +189,10 @@ contract Rentable {
     // refund is:
     // the amount of ether paid for the period (cost - deposit)
     // in ratio to the amount of time the rentable was returned early (timeDelta / totalTime)
-    uint earlyReturnRefund = (reservation.cost - reservation.deposit) * timeDelta / totalTime;
-    pendingRefunds[msg.sender] += earlyReturnRefund / 2;
-    pendingRefunds[msg.sender] += reservation.deposit;
-    pendingRefunds[owner] += earlyReturnRefund / 2;
+    uint periodCost = reservation.cost - reservation.deposit;
+    uint earlyReturnRefund = periodCost * timeDelta / totalTime;
+    pendingRefunds[msg.sender] += earlyReturnRefund / 2 + reservation.deposit;
+    pendingRefunds[owner] += earlyReturnRefund / 2 + (periodCost - earlyReturnRefund);
 
     reservation.end = now; // change current reservation to end now.
     reservation.cost -= earlyReturnRefund;
