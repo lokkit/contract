@@ -171,7 +171,7 @@ contract Rentable {
       // we raise a exception here (not enough money sent by renter)
       throw;
     }
-    pendingRefunds[msg.sender] += msg.value - cost; // add excess value sent to refunds
+    pendingRefunds[msg.sender] += msg.value - cost; // add excess value sent to refunds. Todo: directly send excess back, since "rent" was called by renter.
     reservations.push(Reservation({start:start, end:end, renter:msg.sender, unclaimed:false, cost:cost, deposit:deposit})); // add the reservation to the internal state (in blockchain)
     OnRent(true, msg.sender, start, end, 'Successfuly rented');
   }
@@ -180,7 +180,7 @@ contract Rentable {
   // Refunds half the paid amount to the renter and owner each.
   // Calling completeReservation will pay the owner and refund the deposit to the renter.
   function unclaim () public currentRenterOnly {
-    var (isReserved, reservation) = currentReservation();
+    var (isReserved, reservation) = currentReservation(); // todo: needs optimization. modifier "currentRenterOnly" already executes currentReservation()
     if (!isReserved){
       return;
     }
