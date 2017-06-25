@@ -1,5 +1,12 @@
 # Smart Contracts for lokkit
 
+On a fresh blockchain the following contracts can be deployed using truffe
+```
+Rentable 1: 0x58b5e51386b46d018dcd0a3db91a6c69fed20ea8
+Rentable 2: 0xde93b2965af6a49161f597604c600af9ea07883a
+Rentable 3: 0x75105e510adf9fa0b1b1a5d35f9d8594ad36d8ed
+```
+
 ### Install required packages
 ```
 npm install -g truffle
