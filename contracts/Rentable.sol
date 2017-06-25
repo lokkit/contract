@@ -210,7 +210,6 @@ contract Rentable {
         }
       }
     }
-  }
 
   // Withdraw all my refunds.
   function withdrawRefunds() public {
