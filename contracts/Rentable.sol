@@ -124,7 +124,7 @@ contract Rentable {
   function currentRenter() public constant returns (address) {
     var (isReserved, reservation) = currentReservation();
     if (!isReserved){
-      return owner;
+      return 0;
     } else {
       return reservation.renter;
     }
